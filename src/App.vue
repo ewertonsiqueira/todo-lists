@@ -1,26 +1,8 @@
 <template>
  <div class="container" style="max-width: 800px;">
-    <h1 class="text-center my-4">Tarefinha</h1>
-    
-    <!-- Stats -->
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="row text-center">
-          <div class="col-4">
-            <div class="fw-bold fs-4">{{ totalTask }}</div>
-            <div class="text-muted small">Total</div>
-          </div>
-          <div class="col-4">
-            <div class="fw-bold fs-4 text-success">{{ totalCompleted }}</div>
-            <div class="text-muted small">Concluídas</div>
-          </div>
-          <div class="col-4">
-            <div class="fw-bold fs-4 text-warning"> {{ totalPending }}</div>
-            <div class="text-muted small">Pendentes</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1 class="text-center my-4">TodoList</h1>
+  
+    <TaskStats :tasks="tasks"/>
     
     <!-- Add new task -->
     <div class="input-group mb-3">
@@ -98,15 +80,12 @@
 </template>
 <script setup>
   import { ref, computed } from 'vue'
+import TaskStats from './components/TaskStats.vue'
 
   const tasks = ref([])
   const newTask = ref('')
   const filterSearchs = ref('')
   const filterStatus = ref('')
-
-  const totalTask = computed(() => tasks.value.length || 0)
-  const totalCompleted = computed(() => tasks.value.filter(task => task.completed).length || 0)
-  const totalPending = computed(() => tasks.value.filter(task => !task.completed).length || 0)
 
   const tasksFiltered = computed(() => {
     let result = tasks.value
