@@ -37,24 +37,22 @@
         Adicionar
       </button>
     </div>
-      <pre>{{ tasks }}</pre>
-
 
     <!-- Filters -->
-    <!-- <div class="d-flex gap-2 mb-3">
-      <input type="text" placeholder="Buscar tarefa..." class="form-control" style="flex: 1;">
-      <select class="form-select" style="flex: 1;">
+    <div v-if="tasks.length " class="d-flex gap-2 mb-3">
+      <input v-model="filterSearchs" type="text" placeholder="Buscar tarefa..." class="form-control" style="flex: 1;">
+      <select v-model="filterStatus" class="form-select" style="flex: 1;">
         <option value="">Todas</option>
         <option value="pending">Pendentes</option>
         <option value="completed">Concluídas</option>
       </select>
-      <button class="btn btn-outline-secondary btn-sm" style="flex-shrink: 0;">Limpar filtros</button>
-    </div> -->
+      <button @click="clearFilters" class="btn btn-outline-secondary btn-sm" style="flex-shrink: 0;">Limpar filtros</button>
+    </div>
 
     <!-- Tasks -->
     <ul class="list-group">
       <li
-        v-for="task in tasks"
+        v-for="task in tasksFiltered"
         :key="task.id"
         class="list-group-item d-flex align-items-center gap-2"
       >
@@ -88,24 +86,45 @@
         <button class="btn btn-danger btn-sm" @click="deleteTask(task)">Sim, excluir</button>
         <button class="btn btn-outline-secondary btn-sm" @click="task.state = 'show'">Cancelar</button>
       </template>
-
-      <template v-else>
-        <div class="card bg-light">
-          <div class="card-body text-center py-5">
-            <p class="text-muted mb-0">Nenhuma tarefa cadastrada</p>
-          </div>
-        </div> 
-      </template>
       </li>
     </ul>
+     <div v-if="!tasksFiltered.length" class="card bg-light">
+      <div class="card-body text-center py-5">
+        <p class="text-muted mb-0">{{ empytState }}</p>
+      </div>
+    </div> 
 </div>
 
 </template>
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
 
   const tasks = ref([])
   const newTask = ref('')
+  const filterSearchs = ref('')
+  const filterStatus = ref('')
+
+  const tasksFiltered = computed(() => {
+    let result = tasks.value
+    
+    if (filterSearchs.value) {
+      const search = filterSearchs.value.toLowerCase()
+      result = result.filter(task => task.name.toLowerCase().includes(search))
+    }
+   
+    if (filterStatus.value === 'pending') {
+      return result.filter(task => task.completed === false)
+    } else if (filterStatus.value === 'completed') {
+      result = result.filter(task => task.completed === true)
+    }
+  
+    return result
+  })
+
+  const clearFilters = () => {
+    filterSearchs.value = ''
+    filterStatus.value = ''
+  }
 
   function addNewTask() {
    if (!newTask.value.trim()) return
@@ -144,6 +163,15 @@
       tasks.value.splice(index, 1)
     }
   }
+
+  const empytState = computed(() => {
+    const output = 'Nenhuma tarefa no momento'
+
+    if (filterStatus.value ||  filterSearchs.value) {
+      return 'Nenhuma tafera com esse filtro.'
+    }
+    return output
+  })
 
 </script>
 <style scoped>
