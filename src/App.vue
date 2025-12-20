@@ -5,31 +5,14 @@
     <TaskStats :tasks="tasks"/>
     
     <!-- Add new task -->
-    <div class="input-group mb-3">
-      <input
-        v-model="newTask" 
-        @keyup.enter="addNewTask"
-        placeholder="Adicionar uma nova tarefa..."
-        class="form-control"
-      >
-      <button 
-        class="btn btn-success"
-        @click="addNewTask"
-      >
-        Adicionar
-      </button>
-    </div>
+    <TaskInput @add-task="addNewTask"></TaskInput>
 
     <!-- Filters -->
-    <div v-if="tasks.length " class="d-flex gap-2 mb-3">
-      <input v-model="filterSearchs" type="text" placeholder="Buscar tarefa..." class="form-control" style="flex: 1;">
-      <select v-model="filterStatus" class="form-select" style="flex: 1;">
-        <option value="">Todas</option>
-        <option value="pending">Pendentes</option>
-        <option value="completed">Concluídas</option>
-      </select>
-      <button @click="clearFilters" class="btn btn-outline-secondary btn-sm" style="flex-shrink: 0;">Limpar filtros</button>
-    </div>
+    <FilterTask 
+      v-if="tasks.length"
+      @search="onSearch"
+      @status="onStatus"
+    />
 
     <!-- Tasks -->
     <ul class="list-group">
@@ -79,11 +62,12 @@
 
 </template>
 <script setup>
-  import { ref, computed } from 'vue'
+import { ref, computed } from 'vue'
 import TaskStats from './components/TaskStats.vue'
+import FilterTask from './components/FilterTask.vue'
+import TaskInput from './components/TaskInput.vue'
 
   const tasks = ref([])
-  const newTask = ref('')
   const filterSearchs = ref('')
   const filterStatus = ref('')
 
@@ -104,20 +88,24 @@ import TaskStats from './components/TaskStats.vue'
     return result
   })
 
-  const clearFilters = () => {
-    filterSearchs.value = ''
-    filterStatus.value = ''
+  const onSearch = (search) => {
+    filterSearchs.value = search
   }
 
-  function addNewTask() {
-   if (!newTask.value.trim()) return
-   tasks.value.push({
-    id: Date.now(),
-    name: newTask.value,
-    completed: false,
-    state: 'show'
-  })  
-   newTask.value = ''
+  const onStatus = (status) => {
+    filterStatus.value = status
+  }
+
+
+  const addNewTask = (task) => {
+   if (!task) return
+
+     tasks.value.push({
+      id: Date.now(),
+      name: task,
+      completed: false,
+      state: 'show'
+    })  
   }
 
   const editTask = (task) => {
