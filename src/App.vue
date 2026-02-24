@@ -64,7 +64,8 @@ import TaskEmtyState from './components/TaskEmtyState.vue'
       name: task,
       completed: false,
       state: 'show'
-    })  
+    })
+    tasks.value = ''  
   }
 
 
